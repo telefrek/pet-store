@@ -2,7 +2,7 @@
  * Handles mapping order information to the underlying data storage
  */
 
-import { Database, createDatabase } from "@telefrek/postgres";
+import { Database, createDatabase } from "@telefrek/postgres/index";
 import { PostgresRow, bind } from "@telefrek/postgres/query";
 import { PostgresColumnTypes, PostgresEnum } from "@telefrek/postgres/schema";
 import { Order } from "../entities";
