@@ -1,0 +1,23 @@
+{
+  "name": "petstore-server",
+  "version": "0.1.0",
+  "description": "",
+  "scripts": {
+    "compile": "rm -rf dist/* && tsc -p tsconfig.json",
+    "runStore": "npx ts-node main.ts"
+  },
+  "keywords": [
+    "granada",
+    "framework",
+    "http"
+  ],
+  "main": "main.js",
+  "author": "nathan@telefrek.com",
+  "license": "MIT",
+  "dependencies": {
+    "@telefrek/service": "1.0.0-alpha.2",
+    "@telefrek/postgres": "1.0.0-alpha.2",
+    "@types/k6": "^0.47.3",
+    "@types/node": "20.11.7"
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "exclude": ["**/*.test.ts", "**/node_modules", "dist"],
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "NodeNext",
+    "incremental": true,
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "declaration": true,
+    "resolveJsonModule": true,
+    "noFallthroughCasesInSwitch": false,
+    "noImplicitOverride": true,
+    "experimentalDecorators": true,
+    "outDir": "./dist",
+    "jsx": "react-jsx",
+    "paths": {
+      "@telefrek/*": ["./packages/*/"],
+      "@examples/*": ["./examples/*/"]
+    }
+  }
+}
