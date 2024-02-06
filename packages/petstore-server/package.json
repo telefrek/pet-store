@@ -15,10 +15,10 @@
   "author": "nathan@telefrek.com",
   "license": "MIT",
   "dependencies": {
-    "@telefrek/core": "1.0.0-alpha.8",
-    "@telefrek/http": "1.0.0-alpha.8",
-    "@telefrek/service": "1.0.0-alpha.8",
-    "@telefrek/postgres": "1.0.0-alpha.8",
+    "@telefrek/core": "^1.0.0-alpha.12",
+    "@telefrek/http": "^1.0.0-alpha.12",
+    "@telefrek/service": "^1.0.0-alpha.12",
+    "@telefrek/postgres": "^1.0.0-alpha.12",
     "@types/k6": "^0.47.3",
     "@types/node": "20.11.7"
   }
