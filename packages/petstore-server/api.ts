@@ -4,8 +4,8 @@
 
 import { HttpMethod } from "@telefrek/http";
 import { SerializationFormat, routableApi, route } from "@telefrek/service";
-import { OrderStore } from "./dataAccess/orders";
-import { Order } from "./entities";
+import { OrderStore } from "./dataAccess/orders.js";
+import { Order } from "./entities.js";
 
 @routableApi({ pathPrefix: "/pet" })
 export class PetApi {}

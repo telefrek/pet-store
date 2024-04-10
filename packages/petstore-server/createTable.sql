@@ -1,0 +1,1 @@
+CREATE TABLE IF NOT EXISTS orders (order_id BIGSERIAL PRIMARY KEY, pet_id BIGINT NOT NULL, quantity INTEGER NOT NULL, ship_date BIGINT NOT NULL DEFAULT (extract(epoch from now()) * 1000), status TEXT NOT NULL, complete BOOLEAN NOT NULL);

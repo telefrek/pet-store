@@ -2,6 +2,7 @@
  * Handles mapping order information to the underlying data storage
  */
 
+import { getDebugInfo } from "@telefrek/core/index";
 import {
   DefaultPostgresDatabase,
   type PostgresDatabase,
@@ -11,9 +12,9 @@ import { PostgresConnectionPool } from "@telefrek/postgres/pool";
 import { PostgresColumnTypes } from "@telefrek/postgres/types";
 import { ExecutionMode } from "@telefrek/query";
 import { SQLDatabaseSchema } from "@telefrek/query/sql/schema";
-import { SchemaBuilder } from "@telefrek/query/sql/schema/builder";
+import { SchemaBuilder } from "@telefrek/query/sql/schemaBuilder";
 import { SQLColumnType, SQLColumnTypes } from "@telefrek/query/sql/types";
-import { Order } from "../entities";
+import { Order } from "../entities.js";
 
 const OrderStatus = {
   PLACED: "placed",
@@ -58,6 +59,7 @@ const GET_ORDER_BY_ID = createStore()
 const CREATE_ORDER = createStore()
   .insert("orders")
   .returning("order_id", "ship_date")
+  .columns("pet_id", "status", "quantity", "complete")
   .build("CreateOrder");
 
 class PostgresOrderStore implements OrderStore {
@@ -66,10 +68,12 @@ class PostgresOrderStore implements OrderStore {
   constructor() {
     this.#database = new DefaultPostgresDatabase({
       pool: new PostgresConnectionPool({
+        name: "OrderStore",
         clientConfig: {
           user: "postgres",
           password: "password123",
           database: "postgres",
+          host: "0.0.0.0",
         },
       }),
     });
@@ -78,22 +82,24 @@ class PostgresOrderStore implements OrderStore {
   async createOrder<T extends Omit<Order, "id">>(order: T): Promise<Order> {
     const response = await this.#database.run(
       CREATE_ORDER.bind({
-        order_id: -1,
         pet_id: order.petId,
         status: order.status,
         complete: order.complete,
         quantity: order.quantity,
-        ship_date: new Date(order.shipDate).valueOf(),
       })
     );
 
     if (response.mode === ExecutionMode.Normal) {
+      console.log("got an order back");
+      console.log(getDebugInfo(response));
       return {
         ...order,
         id: response.rows[0].order_id as number,
         shipDate: new Date(response.rows[0].ship_date as number).toISOString(),
       };
     }
+
+    console.log("response mode was wrong");
 
     throw new Error("nope");
   }

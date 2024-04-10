@@ -21,7 +21,7 @@ function App() {
   const [message, setMessage] = useState('none');
   const [orderId, setOrderId] = useState('1');
 
-  function handleClick(_e: unknown) {
+  function handleClick() {
     setMessage('loading...');
     const getMessage = async () => {
       try {
@@ -57,7 +57,7 @@ function App() {
     void getMessage();
   }
 
-  function handleCreate(_e: unknown) {
+  function handleCreate() {
     setMessage('loading...');
     const getMessage = async () => {
       try {
@@ -67,7 +67,7 @@ function App() {
         const req = new Request(`${window.location.origin}/store/order`, {
           method: 'POST',
           body: JSON.stringify({
-            pet_id: 1,
+            petId: 1,
             quantity: 1,
             status: 'placed',
             complete: false,

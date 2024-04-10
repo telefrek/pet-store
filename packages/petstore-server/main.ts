@@ -1,13 +1,16 @@
-import { CONTENT_PARSING_TRANSFORM } from "@telefrek/http/content/parsers";
-import { hostFolder } from "@telefrek/http/hosting/index";
-import { createPipeline } from "@telefrek/http/pipeline";
+import "./telemetry.js";
+
+import { CONTENT_PARSING_TRANSFORM } from "@telefrek/http/parsers";
 import { getDefaultBuilder } from "@telefrek/http/server";
+import { hostFolder } from "@telefrek/http/server/hosting";
+import { createPipeline } from "@telefrek/http/server/pipeline";
 import fs from "fs";
 import path from "path";
-import { StoreApi } from "./api";
-import { createOrderStore } from "./dataAccess/orders";
+import { fileURLToPath } from "url";
+import { StoreApi } from "./api.js";
+import { createOrderStore } from "./dataAccess/orders.js";
 
-const dir = path.dirname(__filename);
+const dir = path.dirname(fileURLToPath(import.meta.url));
 
 const server = getDefaultBuilder()
   .withTls({
@@ -22,17 +25,18 @@ const pipeline = createPipeline(server)
   .withContentParsing(CONTENT_PARSING_TRANSFORM)
   .build();
 
-pipeline.on("error", (err) => {
-  // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-  console.log(`Error: ${err}`);
-});
+// pipeline.on("error", (err) => {
+//   // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+//   console.log(`Error: ${err}`);
+// });
 
-pipeline.on("finished", () => {
-  console.log("pipeline has finished");
-});
+// pipeline.on("finished", () => {
+//   console.log("pipeline has finished");
+// });
 
 process.on("SIGINT", () => {
   console.log("received SIGINT, closing");
+  void pipeline.stop();
   void server.close();
 });
 

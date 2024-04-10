@@ -1,6 +1,7 @@
 **/node_modules
 **/dist
 **/coverage
+**/.npmrc
 
 # Don't store local build cache results
 **/*.tsbuildinfo

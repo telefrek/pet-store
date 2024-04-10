@@ -11,17 +11,23 @@
     "framework",
     "http"
   ],
+  "type": "module",
   "main": "main.js",
   "author": "nathan@telefrek.com",
   "license": "MIT",
   "dependencies": {
-    "@telefrek/core": "^1.0.0-alpha.16",
-    "@telefrek/http": "^1.0.0-alpha.16",
-    "@telefrek/service": "^1.0.0-alpha.16",
-    "@telefrek/postgres": "^1.0.0-alpha.16",
-    "@types/k6": "^0.47.3",
-    "@types/node": "20.11.7",
-    "pg": "8.11.5",
-    "@types/pg": "8.11.5"
+    "@telefrek/postgres": "^1.0.0-alpha.22",
+    "@telefrek/service": "^1.0.0-alpha.22",
+    "@types/k6": "^0.50.0",
+    "@types/node": "20.12.7",
+    "@opentelemetry/auto-instrumentations-node": "^0.44.0",
+    "@opentelemetry/exporter-metrics-otlp-proto": "^0.50.0",
+    "@opentelemetry/exporter-prometheus": "^0.50.0",
+    "@opentelemetry/exporter-trace-otlp-proto": "^0.50.0",
+    "@opentelemetry/resources": "^1.23.0",
+    "@opentelemetry/sdk-node": "^0.50.0"
+  },
+  "devDependencies": {
+    "tsx": "^4.7.2"
   }
 }
