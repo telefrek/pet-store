@@ -1,0 +1,8 @@
+FROM alpine:3.16.2 as arm64musl
+
+COPY setup_config.sh .
+
+RUN apk update && \
+    apk add make g++ python3 gnupg curl file flex patch rsync texinfo
+RUN ./setup_config.sh
+

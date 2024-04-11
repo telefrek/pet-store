@@ -1,0 +1,51 @@
+
+FROM arm64musl:1
+
+ENV NODE_VERSION=21.7.3
+ENV TARGET=aarch64-linux-musl
+ENV CC=$TARGET-gcc
+ENV CXX=$TARGET-g++
+ENV AR=$TARGET-ar
+ENV NM=$TARGET-nm
+ENV ANLIB=$TARGET-ranlib
+ENV LINK=$TARGET-g++
+ENV CXXFLAGS="-O3 -ffunction-sections -fdata-sections"
+ENV LDFLAGS="-Wl,--gc-sections,--strip-all"
+
+COPY build_node.sh .
+
+# RUN ./build_node.sh
+
+# RUN curl -sf -o node.tar.gz https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION.tar.gz
+# RUN tar -xf node.tar.gz
+# RUN cd node-v$NODE_VERSION
+
+
+# RUN ln -snf libc.so /usr/local/$TARGET/lib/ld-musl-*.so.1
+# RUN ln -snf /usr/local/$TARGET/lib/ld-musl-*.so.1 /lib 
+# RUN ./configure --enable-static --partly-static --without-inspector --without-corepack --without-npm --v8-enable-hugepage --v8-enable-maglev --with-arm-float-abi=hard --with-arm-fpu=neon --enable-lto
+# RUN make -j8
+
+# RUN echo 'node:x:1000:1000:Linux User,,,:/home/node:/bin/sh' > /tmp/passwd
+
+# FROM scratch
+
+# ENV NODE_VERSION=21.7.3
+
+# COPY --from=nodeBuild node-v$NODE_VERSION/out/Release/node /bin/node
+# COPY --from=nodeBuild /lib/ld-musl-*.so.1 /lib/
+# COPY --from=nodeBuild /tmp/passwd /etc/passwd
+
+# USER node
+
+# ENTRYPOINT ["node"]
+
+# RUN yum groupinstall -y "Development Tools"
+# RUN yum -y install clang python3 openssl gcc-c++ make python3-pip
+
+# Configuring for current platform
+# RUN ./configure --enable-lto --fully-static --enable-static --download=all --without-npm --without-corepack --without-inspector --v8-enable-hugepage --v8-enable-maglev
+# RUN make -j8
+
+# ARM
+# RUN ./configure --with-arm-float-abi=hard --with-arm-fpu=neon --enable-lto --partly-static  --without-npm --without-corepack --without-inspector --v8-enable-hugepage --v8-enable-maglev --v8-enable-snapshot-compression --v8-enable-short-builtin-calls
