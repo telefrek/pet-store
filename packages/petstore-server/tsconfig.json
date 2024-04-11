@@ -1,9 +1,10 @@
 {
   "extends": "../../tsconfig.build.json",
   "compilerOptions": {
-    "outDir": "./dist/"
+    "outDir": "./dist/",
+    "declaration": false
   },
-  "include": ["./**/*.ts"],
+  "include": ["./**/*.ts", "./utils/server.crt", "./utils/server.key"],
   "exclude": ["./dist/**/*"],
   "ts-node": {
     "esm": true

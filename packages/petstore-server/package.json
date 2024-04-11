@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "",
   "scripts": {
-    "compile": "rm -rf dist/* && tsc -p tsconfig.json",
+    "build": "rm -rf dist/* && tsc -p tsconfig.json && cp -R ./utils ./dist/utils",
     "runStore": "npx ts-node main.ts"
   },
   "keywords": [

@@ -20,7 +20,7 @@ const server = getDefaultBuilder()
   .build();
 
 const pipeline = createPipeline(server)
-  .withContentHosting(hostFolder(path.join(dir, "../petstore-ui/build")))
+  .withContentHosting(hostFolder(path.join(dir, "../ui")))
   .withApi(new StoreApi(createOrderStore()))
   .withContentParsing(CONTENT_PARSING_TRANSFORM)
   .build();

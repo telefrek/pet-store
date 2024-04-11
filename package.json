@@ -6,7 +6,8 @@
   "scripts": {
     "test": "jest --coverage --coverageProvider=v8",
     "format": "npx prettier --write .",
-    "upgrade-all": "npx npm-check-updates -u && npm install --legacy-peer-deps && npm run upgrade --workspaces --if-present"
+    "upgrade-all": "npx npm-check-updates -u && npm install --legacy-peer-deps && npm run upgrade --workspaces --if-present",
+    "build": "npm run -ws build --if-present"
   },
   "jest": {
     "projects": [
