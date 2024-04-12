@@ -19,20 +19,13 @@ const server = getDefaultBuilder()
   })
   .build();
 
+const ui_path = process.env.UI_PATH ?? "../petstore-ui/build";
+
 const pipeline = createPipeline(server)
-  .withContentHosting(hostFolder(path.join(dir, "../ui")))
+  .withContentHosting(hostFolder(path.join(dir, ui_path)))
   .withApi(new StoreApi(createOrderStore()))
   .withContentParsing(CONTENT_PARSING_TRANSFORM)
   .build();
-
-// pipeline.on("error", (err) => {
-//   // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-//   console.log(`Error: ${err}`);
-// });
-
-// pipeline.on("finished", () => {
-//   console.log("pipeline has finished");
-// });
 
 process.on("SIGINT", () => {
   console.log("received SIGINT, closing");

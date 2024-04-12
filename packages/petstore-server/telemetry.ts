@@ -25,3 +25,7 @@ export const sdk = new NodeSDK({
 });
 
 sdk.start();
+
+// Turn on the node metrics
+import { enableNodeCoreMetrics } from "@telefrek/core/observability/metrics";
+await enableNodeCoreMetrics();

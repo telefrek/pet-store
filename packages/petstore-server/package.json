@@ -16,8 +16,8 @@
   "author": "nathan@telefrek.com",
   "license": "MIT",
   "dependencies": {
-    "@telefrek/postgres": "^1.0.0-alpha.22",
-    "@telefrek/service": "^1.0.0-alpha.22",
+    "@telefrek/postgres": "^1.0.0-alpha.24",
+    "@telefrek/service": "^1.0.0-alpha.24",
     "@types/k6": "^0.50.0",
     "@types/node": "20.12.7",
     "@opentelemetry/auto-instrumentations-node": "^0.44.0",

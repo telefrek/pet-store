@@ -1,4 +1,4 @@
-FROM alpine:3.16.2 as arm64musl
+FROM alpine:3.16.2
 
 COPY setup_config.sh .
 

@@ -1,5 +1,5 @@
 
-FROM arm64musl:1 as builder
+FROM nnorthcutt/musl-cross-build:aarch64 as builder
 
 ENV NODE_VERSION=21.7.3
 ENV TARGET=aarch64-linux-musl
@@ -14,17 +14,20 @@ ENV LDFLAGS="-Wl,--gc-sections,--strip-all"
 
 COPY build_node.sh .
 
-RUN ./build_node.sh
-RUN echo 'node:x:1000:1000:Linux User,,,:/home/node:/bin/sh' > /tmp/passwd
+ENTRYPOINT ["/bin/sh"]
 
-FROM scratch
+# RUN ./build_node.sh
 
-ENV NODE_VERSION=21.7.3
+# RUN echo 'node:x:1000:1000:Linux User,,,:/home/node:/bin/sh' > /tmp/passwd
 
-COPY --from=builder node-v$NODE_VERSION/out/Release/node /bin/node
-COPY --from=builder /lib/ld-musl-*.so.1 /lib/
-COPY --from=builder /tmp/passwd /etc/passwd
+# FROM scratch
 
-USER node
+# ENV NODE_VERSION=21.7.3
 
-ENTRYPOINT ["node"]
+# COPY --from=builder node-v$NODE_VERSION/out/Release/node /bin/node
+# COPY --from=builder /lib/ld-musl-*.so.1 /lib/
+# COPY --from=builder /tmp/passwd /etc/passwd
+
+# USER node
+
+# ENTRYPOINT ["node"]
