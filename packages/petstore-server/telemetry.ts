@@ -15,7 +15,10 @@ const resource = Resource.default().merge(
   })
 );
 
-const exporter = new PrometheusExporter();
+const exporter = new PrometheusExporter({
+  host: "0.0.0.0",
+  port: 3001,
+});
 
 export const sdk = new NodeSDK({
   traceExporter: new OTLPTraceExporter(),

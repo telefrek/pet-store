@@ -1,0 +1,40 @@
+prometheus:
+  fullnameOverride: "prometheus"
+  
+  defaultRules:
+    create: false
+
+  ## We don't care about this for now
+  alertmanager:
+    enabled: false
+
+  # We want grafana
+  grafana:
+    enabled: true
+    adminPassword: password
+
+  # We want service monitors
+  kubernetesServiceMonitors:
+    enabled: true
+
+  coreDns:
+    enabled: true
+
+  kubeDns:
+    enabled: false
+
+  prometheusOperator:
+    enabled: true
+
+  prometheus:
+    enabled: true
+
+    prometheusSpec:
+      ruleSelectorNilUsesHelmValues: false
+      serviceMonitorSelectorNilUsesHelmValues: false
+      podMonitorSelectorNilUsesHelmValues: false
+      probeSelectorNilUsesHelmValues: false
+      scrapeConfigSelectorNilUsesHelmValues: false
+
+  thanosRuler:
+    enabled: false

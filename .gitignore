@@ -3,5 +3,8 @@
 **/coverage
 **/.npmrc
 
+# Ignore helm charts
+**/helm/**/charts
+
 # Don't store local build cache results
 **/*.tsbuildinfo

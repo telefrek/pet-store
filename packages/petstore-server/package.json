@@ -4,7 +4,8 @@
   "description": "",
   "scripts": {
     "build": "rm -rf dist/* && tsc -p tsconfig.json && cp -R ./utils ./dist/utils",
-    "runStore": "npx ts-node main.ts"
+    "runStore": "npx ts-node main.ts",
+    "upgrade": "npx npm-check-updates -u && npm install --legacy-peer-deps"
   },
   "keywords": [
     "granada",
@@ -16,8 +17,10 @@
   "author": "nathan@telefrek.com",
   "license": "MIT",
   "dependencies": {
-    "@telefrek/postgres": "^1.0.0-alpha.24",
-    "@telefrek/service": "^1.0.0-alpha.24",
+    "@telefrek/core": "^1.0.0-alpha.31",
+    "@telefrek/http": "^1.0.0-alpha.31",
+    "@telefrek/postgres": "^1.0.0-alpha.31",
+    "@telefrek/service": "^1.0.0-alpha.31",
     "@types/k6": "^0.50.0",
     "@types/node": "20.12.7",
     "@opentelemetry/auto-instrumentations-node": "^0.44.0",

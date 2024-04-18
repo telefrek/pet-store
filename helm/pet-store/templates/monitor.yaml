@@ -1,0 +1,11 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: petstore-monitor
+spec:
+  selector:
+    matchLabels:
+      app: pet-store
+  endpoints:
+    - targetPort: 3001
+      interval: 15s

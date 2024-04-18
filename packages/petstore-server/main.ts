@@ -1,9 +1,12 @@
 import "./telemetry.js";
 
-import { CONTENT_PARSING_TRANSFORM } from "@telefrek/http/parsers";
-import { getDefaultBuilder } from "@telefrek/http/server";
-import { hostFolder } from "@telefrek/http/server/hosting";
-import { createPipeline } from "@telefrek/http/server/pipeline";
+import { ConsoleLogWriter, LogLevel } from "@telefrek/core/logging.js";
+import { getDefaultBuilder } from "@telefrek/http/server.js";
+import { hostFolder } from "@telefrek/http/server/hosting.js";
+import {
+  httpPipelineBuilder,
+  setPipelineLogLevel,
+} from "@telefrek/http/server/pipeline.js";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -19,19 +22,22 @@ const server = getDefaultBuilder()
   })
   .build();
 
-const ui_path = process.env.UI_PATH ?? "../petstore-ui/build";
+const baseDir = process.env.UI_PATH ?? path.join(dir, "../petstore-ui/build");
 
-const pipeline = createPipeline(server)
-  .withContentHosting(hostFolder(path.join(dir, ui_path)))
+setPipelineLogLevel(LogLevel.DEBUG);
+
+const pipeline = httpPipelineBuilder(server)
+  .withDefaults()
+  .withTransforms(
+    hostFolder({
+      baseDir,
+      level: LogLevel.DEBUG,
+      writer: new ConsoleLogWriter(),
+      name: "Petstore Hosting",
+    })
+  )
   .withApi(new StoreApi(createOrderStore()))
-  .withContentParsing(CONTENT_PARSING_TRANSFORM)
   .build();
-
-process.on("SIGINT", () => {
-  console.log("received SIGINT, closing");
-  void pipeline.stop();
-  void server.close();
-});
 
 // Wait for the end...
 void server.listen(3000);

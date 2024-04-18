@@ -3,7 +3,8 @@
  */
 
 import { HttpMethod } from "@telefrek/http";
-import { SerializationFormat, routableApi, route } from "@telefrek/service";
+import { SerializationFormat } from "@telefrek/service";
+import { routableApi, route } from "@telefrek/service/decorators";
 import { OrderStore } from "./dataAccess/orders.js";
 import { Order } from "./entities.js";
 
@@ -41,18 +42,18 @@ export class StoreApi {
   }
 
   @route({
-    template: "/order/{orderId}",
+    template: "/order/:orderId",
     method: HttpMethod.GET,
-    parameters: ["orderId"],
+    mapping: (parameters, body) => [parameters.get("orderId")],
   })
   async getOrder(orderId: number): Promise<Order | undefined> {
     return await this.#orderStore.getOrderById(orderId);
   }
 
   @route({
-    template: "/order/{orderId}",
+    template: "/order/:orderId",
     method: HttpMethod.DELETE,
-    parameters: ["orderId"],
+    mapping: (parameters, body) => [parameters.get("orderId")],
   })
   async deleteOrder(orderId: number): Promise<void> {
     if (await this.#orderStore.getOrderById(orderId)) {
