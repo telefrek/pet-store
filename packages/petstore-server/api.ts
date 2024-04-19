@@ -46,8 +46,8 @@ export class StoreApi {
     method: HttpMethod.GET,
     mapping: (parameters, body) => [parameters.get("orderId")],
   })
-  async getOrder(orderId: number): Promise<Order | undefined> {
-    return await this.#orderStore.getOrderById(orderId);
+  getOrder(orderId: number): Promise<Order | undefined> {
+    return this.#orderStore.getOrderById(orderId);
   }
 
   @route({
@@ -73,7 +73,7 @@ export class StoreApi {
     method: HttpMethod.GET,
     format: SerializationFormat.JSON,
   })
-  async getInventory(): Promise<Record<string, number>> {
+  getInventory(): Promise<Record<string, number>> {
     return Promise.resolve({
       colleenIsAwesome: 3,
     });

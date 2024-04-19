@@ -1,0 +1,68 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: petstore-monitor
+  labels:
+    metrics: prometheus
+spec:
+  selector:
+    matchLabels:
+      app: petstore
+  endpoints:
+    - port: metrics
+      interval: 15s
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: petstore
+  labels:
+    app: petstore
+spec:
+  type: ClusterIP
+  ports:
+    - port: 3000
+      targetPort: 3000
+      protocol: TCP
+      name: http
+    - port: 3001
+      targetPort: 3001
+      protocol: TCP
+      name: metrics
+  selector:
+    app: petstore
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: petstore
+spec:
+  selector:
+    matchLabels:
+      app: petstore
+  template:
+    metadata:
+      labels:
+        app: petstore
+    spec:
+      containers:
+        - name: app
+          image: "petstore:test"
+          imagePullPolicy: Never
+          ports:
+            - name: http
+              containerPort: 3000
+              protocol: TCP
+            - name: metrics
+              containerPort: 3001
+              procotol: TCP
+          resources:
+            limits:
+              cpu: "1"
+              memory: "1Gi"
+            requests:
+              cpu: ".5"
+              memory: "1Gi"
+          env:
+            - name: PG_HOST
+              value: postgres.default.svc

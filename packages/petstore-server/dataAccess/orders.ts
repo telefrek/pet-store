@@ -2,7 +2,12 @@
  * Handles mapping order information to the underlying data storage
  */
 
-import { getDebugInfo } from "@telefrek/core/index";
+import {
+  ConsoleLogWriter,
+  DefaultLogger,
+  LogLevel,
+  type Logger,
+} from "@telefrek/core/logging";
 import {
   DefaultPostgresDatabase,
   type PostgresDatabase,
@@ -64,6 +69,12 @@ const CREATE_ORDER = createStore()
 
 class PostgresOrderStore implements OrderStore {
   #database: PostgresDatabase;
+  #log: Logger = new DefaultLogger({
+    name: "OrderStore",
+    writer: new ConsoleLogWriter(),
+    includeTimestamps: true,
+    level: LogLevel.INFO,
+  });
 
   constructor() {
     this.#database = new DefaultPostgresDatabase({
@@ -73,13 +84,14 @@ class PostgresOrderStore implements OrderStore {
           user: "postgres",
           password: "password123",
           database: "postgres",
-          host: "0.0.0.0",
+          host: process.env.PG_HOST ?? "0.0.0.0",
         },
       }),
     });
   }
 
   async createOrder<T extends Omit<Order, "id">>(order: T): Promise<Order> {
+    this.#log.info(`Creating order...`);
     const response = await this.#database.run(
       CREATE_ORDER.bind({
         pet_id: order.petId,
@@ -90,8 +102,7 @@ class PostgresOrderStore implements OrderStore {
     );
 
     if (response.mode === ExecutionMode.Normal) {
-      console.log("got an order back");
-      console.log(getDebugInfo(response));
+      this.#log.info(`Created order ${response.rows[0].order_id}`);
       return {
         ...order,
         id: response.rows[0].order_id as number,
@@ -99,25 +110,34 @@ class PostgresOrderStore implements OrderStore {
       };
     }
 
-    console.log("response mode was wrong");
-
     throw new Error("nope");
   }
 
   async getOrderById(id: number): Promise<Order | undefined> {
-    const response = await this.#database.run(
-      GET_ORDER_BY_ID.bind({ orderId: id })
-    );
+    this.#log.info(`Getting order by id: ${id}...`);
+    try {
+      const response = await this.#database.run(
+        GET_ORDER_BY_ID.bind({ orderId: id })
+      );
 
-    if (response.mode === ExecutionMode.Normal) {
-      return {
-        id: response.rows[0].order_id as number,
-        petId: response.rows[0].pet_id as number,
-        shipDate: new Date(response.rows[0].ship_date as number).toISOString(),
-        quantity: response.rows[0].quantity,
-        status: response.rows[0].status,
-        complete: response.rows[0].complete,
-      } as Order;
+      if (response.mode === ExecutionMode.Normal) {
+        this.#log.info(`Found ${response.rows.length} matching objects!`);
+
+        return {
+          id: response.rows[0].order_id as number,
+          petId: response.rows[0].pet_id as number,
+          shipDate: new Date(
+            response.rows[0].ship_date as number
+          ).toISOString(),
+          quantity: response.rows[0].quantity,
+          status: response.rows[0].status,
+          complete: response.rows[0].complete,
+        } as Order;
+      } else {
+        this.#log.info(`Failed to retrieve a response`);
+      }
+    } catch (err) {
+      this.#log.error(`Failed to get response: ${err}`, err);
     }
   }
 }

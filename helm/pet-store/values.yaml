@@ -10,6 +10,7 @@ prometheus:
 
   # We want grafana
   grafana:
+    fullnameOverride: 'grafana'
     enabled: true
     adminPassword: password
 
@@ -27,6 +28,7 @@ prometheus:
     enabled: true
 
   prometheus:
+    fullnameOverride: 'prometheus'
     enabled: true
 
     prometheusSpec:
@@ -35,6 +37,10 @@ prometheus:
       podMonitorSelectorNilUsesHelmValues: false
       probeSelectorNilUsesHelmValues: false
       scrapeConfigSelectorNilUsesHelmValues: false
+
+      serviceMonitorSelector:
+        matchLabels:
+          metrics: prometheus
 
   thanosRuler:
     enabled: false

@@ -1,11 +1,15 @@
 import "./telemetry.js";
 
 import { ConsoleLogWriter, LogLevel } from "@telefrek/core/logging.js";
-import { getDefaultBuilder } from "@telefrek/http/server.js";
+import {
+  httpServerBuilder,
+  setHttpServerLogWriter,
+} from "@telefrek/http/server.js";
 import { hostFolder } from "@telefrek/http/server/hosting.js";
 import {
   httpPipelineBuilder,
   setPipelineLogLevel,
+  setPipelineWriter,
 } from "@telefrek/http/server/pipeline.js";
 import fs from "fs";
 import path from "path";
@@ -15,7 +19,7 @@ import { createOrderStore } from "./dataAccess/orders.js";
 
 const dir = path.dirname(fileURLToPath(import.meta.url));
 
-const server = getDefaultBuilder()
+const server = httpServerBuilder()
   .withTls({
     key: fs.readFileSync(path.join(dir, "./utils/server.key"), "utf-8"),
     cert: fs.readFileSync(path.join(dir, "./utils/server.crt"), "utf-8"),
@@ -24,7 +28,10 @@ const server = getDefaultBuilder()
 
 const baseDir = process.env.UI_PATH ?? path.join(dir, "../petstore-ui/build");
 
-setPipelineLogLevel(LogLevel.DEBUG);
+const writer = new ConsoleLogWriter();
+setPipelineLogLevel(LogLevel.INFO);
+setPipelineWriter(writer);
+setHttpServerLogWriter(writer);
 
 const pipeline = httpPipelineBuilder(server)
   .withDefaults()
@@ -40,4 +47,5 @@ const pipeline = httpPipelineBuilder(server)
   .build();
 
 // Wait for the end...
-void server.listen(3000);
+await server.listen(3000);
+await pipeline.stop();
