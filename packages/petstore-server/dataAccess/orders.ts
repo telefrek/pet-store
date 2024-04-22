@@ -44,6 +44,8 @@ export interface OrderStore {
   getOrderById(id: number): Promise<Order | undefined>;
 
   createOrder<T extends Omit<Order, "id">>(order: T): Promise<Order>;
+
+  close(): void;
 }
 
 export function createOrderStore(): OrderStore {
@@ -88,6 +90,10 @@ class PostgresOrderStore implements OrderStore {
         },
       }),
     });
+  }
+
+  close(): void {
+    this.#database.close();
   }
 
   async createOrder<T extends Omit<Order, "id">>(order: T): Promise<Order> {

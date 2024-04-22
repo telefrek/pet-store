@@ -1,6 +1,15 @@
-import "./telemetry.js";
+import {
+  ConsoleLogWriter,
+  LogLevel,
+  setGlobalLogLevel,
+  setGlobalWriter,
+} from "@telefrek/core/logging.js";
 
-import { ConsoleLogWriter, LogLevel } from "@telefrek/core/logging.js";
+// Setup the logging
+const writer = new ConsoleLogWriter();
+setGlobalLogLevel(LogLevel.INFO);
+setGlobalWriter(writer);
+
 import {
   httpServerBuilder,
   setHttpServerLogWriter,
@@ -17,6 +26,10 @@ import { fileURLToPath } from "url";
 import { StoreApi } from "./api.js";
 import { createOrderStore } from "./dataAccess/orders.js";
 
+setPipelineLogLevel(LogLevel.INFO);
+setPipelineWriter(writer);
+setHttpServerLogWriter(writer);
+
 const dir = path.dirname(fileURLToPath(import.meta.url));
 
 const server = httpServerBuilder()
@@ -28,10 +41,7 @@ const server = httpServerBuilder()
 
 const baseDir = process.env.UI_PATH ?? path.join(dir, "../petstore-ui/build");
 
-const writer = new ConsoleLogWriter();
-setPipelineLogLevel(LogLevel.INFO);
-setPipelineWriter(writer);
-setHttpServerLogWriter(writer);
+const orderStore = createOrderStore();
 
 const pipeline = httpPipelineBuilder(server)
   .withDefaults()
@@ -43,9 +53,10 @@ const pipeline = httpPipelineBuilder(server)
       name: "Petstore Hosting",
     })
   )
-  .withApi(new StoreApi(createOrderStore()))
+  .withApi(new StoreApi(orderStore))
   .build();
 
 // Wait for the end...
 await server.listen(3000);
 await pipeline.stop();
+orderStore.close();

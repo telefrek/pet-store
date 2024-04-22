@@ -26,7 +26,7 @@ function App() {
     const getMessage = async () => {
       try {
         const controller = new AbortController();
-        const id = setTimeout(() => controller.abort(), 150);
+        const id = setTimeout(() => controller.abort(), 500);
 
         const req = new Request(`${window.location.origin}/store/order/${orderId}`, {
           method: 'GET',
@@ -62,7 +62,7 @@ function App() {
     const getMessage = async () => {
       try {
         const controller = new AbortController();
-        const id = setTimeout(() => controller.abort(), 150);
+        const id = setTimeout(() => controller.abort(), 500);
 
         const req = new Request(`${window.location.origin}/store/order`, {
           method: 'POST',

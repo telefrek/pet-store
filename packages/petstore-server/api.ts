@@ -2,8 +2,14 @@
  * This package contains the petstore service api
  */
 
-import { HttpMethod } from "@telefrek/http";
-import { SerializationFormat } from "@telefrek/service";
+import {
+  ConsoleLogWriter,
+  DefaultLogger,
+  LogLevel,
+  type Logger,
+} from "@telefrek/core/logging";
+import { HttpMethod, HttpStatus } from "@telefrek/http";
+import { SerializationFormat, type ServiceResponse } from "@telefrek/service";
 import { routableApi, route } from "@telefrek/service/decorators";
 import { OrderStore } from "./dataAccess/orders.js";
 import { Order } from "./entities.js";
@@ -17,6 +23,7 @@ export class PetApi {}
 @routableApi({ pathPrefix: "/store", format: SerializationFormat.JSON })
 export class StoreApi {
   readonly #orderStore: OrderStore;
+  readonly _log: Logger;
 
   /**
    * Ctor for the {@link StoreApi}
@@ -25,6 +32,12 @@ export class StoreApi {
    */
   constructor(orderStore: OrderStore) {
     this.#orderStore = orderStore;
+    this._log = new DefaultLogger({
+      name: "OrderApi",
+      level: LogLevel.INFO,
+      writer: new ConsoleLogWriter(),
+      includeTimestamps: true,
+    });
   }
 
   /**
@@ -37,8 +50,15 @@ export class StoreApi {
     template: "/order",
     method: HttpMethod.POST,
   })
-  placeOrder(order: Omit<Order, "id">): Promise<Order> {
-    return this.#orderStore.createOrder(order);
+  async placeOrder(order: Omit<Order, "id">): Promise<ServiceResponse<Order>> {
+    try {
+      return await this.#orderStore.createOrder(order);
+    } catch (err) {
+      this._log.error(`Error during order creation: ${err}`, err);
+      return {
+        status: HttpStatus.INTERNAL_SERVER_ERROR,
+      };
+    }
   }
 
   @route({

@@ -1,6 +1,5 @@
-import { getNodeAutoInstrumentations } from "@opentelemetry/auto-instrumentations-node";
+import { context } from "@opentelemetry/api";
 import { PrometheusExporter } from "@opentelemetry/exporter-prometheus";
-import { OTLPTraceExporter } from "@opentelemetry/exporter-trace-otlp-proto";
 import { Resource } from "@opentelemetry/resources";
 import { NodeSDK } from "@opentelemetry/sdk-node";
 import {
@@ -15,20 +14,40 @@ const resource = Resource.default().merge(
   })
 );
 
-const exporter = new PrometheusExporter({
+// Use the async local storage manager
+context.setGlobalContextManager(new AsyncLocalStorageContextManager());
+
+const metricReader = new PrometheusExporter({
   host: "0.0.0.0",
   port: 3001,
 });
 
-export const sdk = new NodeSDK({
-  traceExporter: new OTLPTraceExporter(),
-  metricReader: exporter,
-  instrumentations: [getNodeAutoInstrumentations()],
+const traceExporter = new OTLPTraceExporter({
+  url: "http://petstore-jaeger.default.svc:4318/v1/traces",
+});
+
+// const traceExporter = new ConsoleSpanExporter();
+
+const sdk = new NodeSDK({
+  traceExporter,
+  metricReader,
+  instrumentations: [],
   resource,
 });
 
 sdk.start();
 
 // Turn on the node metrics
-import { enableNodeCoreMetrics } from "@telefrek/core/observability/metrics";
+import { AsyncLocalStorageContextManager } from "@opentelemetry/context-async-hooks";
+import { OTLPTraceExporter } from "@opentelemetry/exporter-trace-otlp-http";
+import { registerShutdown } from "@telefrek/core/lifecycle";
+import {
+  enableGranadaMetrics,
+  enableNodeCoreMetrics,
+} from "@telefrek/core/observability/metrics";
 await enableNodeCoreMetrics();
+enableGranadaMetrics();
+
+registerShutdown(() => {
+  sdk.shutdown();
+});

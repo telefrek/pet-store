@@ -33,4 +33,4 @@ COPY --from=build --chown=node:node /build/packages/petstore-server/dist/ /serve
 COPY --from=modulesBuild --chown=node:node /build/node_modules/ /node_modules
 COPY --from=modulesBuild --chown=node:node /build/package.json /server/package.json
 
-ENTRYPOINT [ "node", "--max-old-space-size=256", "--max-semi-space-size=64", "/server/main.js" ]
+ENTRYPOINT [ "node", "--max-old-space-size=256", "--max-semi-space-size=64", "--import", "/server/telemetry.js", "/server/main.js" ]

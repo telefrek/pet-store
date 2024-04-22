@@ -1,3 +1,6 @@
+jaeger:
+  enableHttpOpenTelemetryCollector: true
+
 prometheus:
   fullnameOverride: "prometheus"
   
@@ -19,12 +22,15 @@ prometheus:
     enabled: true
 
   coreDns:
+    fullnameOverride: 'coreDns'
     enabled: true
 
   kubeDns:
+    fullnameOverride: 'kubeDns'
     enabled: false
 
   prometheusOperator:
+    fullnameOverride: 'prometheus-operator'
     enabled: true
 
   prometheus:

@@ -52,10 +52,22 @@ spec:
           ports:
             - name: http
               containerPort: 3000
-              protocol: TCP
             - name: metrics
               containerPort: 3001
-              procotol: TCP
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+              scheme: HTTPS
+            initialDelaySeconds: 2
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 3000
+              scheme: HTTPS
+            initialDelaySeconds: 2
+            periodSeconds: 5
           resources:
             limits:
               cpu: "1"
