@@ -37,17 +37,30 @@ const sdk = new NodeSDK({
 
 sdk.start();
 
+import {
+  ConsoleLogWriter,
+  LogLevel,
+  setDefaultLogLevel,
+  setDefaultWriter,
+  setGlobalLogLevel,
+} from "@telefrek/core/logging.js";
+setDefaultWriter(new ConsoleLogWriter());
+setDefaultLogLevel(LogLevel.WARN);
+
+setGlobalLogLevel(LogLevel.WARN);
+
 // Turn on the node metrics
 import { AsyncLocalStorageContextManager } from "@opentelemetry/context-async-hooks";
 import { OTLPTraceExporter } from "@opentelemetry/exporter-trace-otlp-http";
-import { registerShutdown } from "@telefrek/core/lifecycle";
 import {
   enableGranadaMetrics,
   enableNodeCoreMetrics,
-} from "@telefrek/core/observability/metrics";
+} from "@telefrek/core/observability/metrics.js";
+
 await enableNodeCoreMetrics();
 enableGranadaMetrics();
 
+import { registerShutdown } from "@telefrek/core/lifecycle.js";
 registerShutdown(() => {
   sdk.shutdown();
 });

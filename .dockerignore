@@ -1,4 +1,6 @@
 # Remove unnecessary folders
-**/node_modules
-**/dist
+
+# Temporary for saving on build caching network
+#**/node_modules
+#**/dist
 scripts

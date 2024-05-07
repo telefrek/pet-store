@@ -2,13 +2,14 @@
  * This package contains the petstore service api
  */
 
+import { getDebugInfo } from "@telefrek/core";
 import {
-  ConsoleLogWriter,
   DefaultLogger,
   LogLevel,
+  info,
   type Logger,
 } from "@telefrek/core/logging";
-import { HttpMethod, HttpStatus } from "@telefrek/http";
+import { HttpMethod, HttpStatusCode } from "@telefrek/http";
 import { SerializationFormat, type ServiceResponse } from "@telefrek/service";
 import { routableApi, route } from "@telefrek/service/decorators";
 import { OrderStore } from "./dataAccess/orders.js";
@@ -35,8 +36,6 @@ export class StoreApi {
     this._log = new DefaultLogger({
       name: "OrderApi",
       level: LogLevel.INFO,
-      writer: new ConsoleLogWriter(),
-      includeTimestamps: true,
     });
   }
 
@@ -49,6 +48,11 @@ export class StoreApi {
   @route({
     template: "/order",
     method: HttpMethod.POST,
+    format: SerializationFormat.JSON,
+    mapping: (_, body) => {
+      info(`Received p=${_}, body=${getDebugInfo(body)}`);
+      return [body];
+    },
   })
   async placeOrder(order: Omit<Order, "id">): Promise<ServiceResponse<Order>> {
     try {
@@ -56,7 +60,7 @@ export class StoreApi {
     } catch (err) {
       this._log.error(`Error during order creation: ${err}`, err);
       return {
-        status: HttpStatus.INTERNAL_SERVER_ERROR,
+        code: HttpStatusCode.INTERNAL_SERVER_ERROR,
       };
     }
   }
@@ -64,7 +68,7 @@ export class StoreApi {
   @route({
     template: "/order/:orderId",
     method: HttpMethod.GET,
-    mapping: (parameters, body) => [parameters.get("orderId")],
+    mapping: (parameters, _) => [parameters.get("orderId")],
   })
   getOrder(orderId: number): Promise<Order | undefined> {
     return this.#orderStore.getOrderById(orderId);
@@ -73,7 +77,7 @@ export class StoreApi {
   @route({
     template: "/order/:orderId",
     method: HttpMethod.DELETE,
-    mapping: (parameters, body) => [parameters.get("orderId")],
+    mapping: (parameters, _) => [parameters.get("orderId")],
   })
   async deleteOrder(orderId: number): Promise<void> {
     if (await this.#orderStore.getOrderById(orderId)) {

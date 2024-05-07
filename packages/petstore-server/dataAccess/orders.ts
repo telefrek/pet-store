@@ -74,7 +74,6 @@ class PostgresOrderStore implements OrderStore {
   #log: Logger = new DefaultLogger({
     name: "OrderStore",
     writer: new ConsoleLogWriter(),
-    includeTimestamps: true,
     level: LogLevel.INFO,
   });
 
@@ -88,6 +87,7 @@ class PostgresOrderStore implements OrderStore {
           database: "postgres",
           host: process.env.PG_HOST ?? "0.0.0.0",
         },
+        defaultTimeoutMs: 10_000,
       }),
     });
   }
@@ -126,8 +126,10 @@ class PostgresOrderStore implements OrderStore {
         GET_ORDER_BY_ID.bind({ orderId: id })
       );
 
-      if (response.mode === ExecutionMode.Normal) {
-        this.#log.info(`Found ${response.rows.length} matching objects!`);
+      if (response.mode === ExecutionMode.Normal && response.rows.length > 0) {
+        this.#log.info(
+          `Found ${response.rows.length && response.rows.length > 0} matching objects!`
+        );
 
         return {
           id: response.rows[0].order_id as number,

@@ -5,7 +5,7 @@ WORKDIR /build
 
 COPY . ./
 
-RUN npm install --legacy-peer-deps=true
+#RUN npm install --legacy-peer-deps=true
 RUN npm run build
 
 # Clean out type definitions and readme that aren't needed
@@ -16,7 +16,8 @@ FROM node:21-alpine as modulesBuild
 WORKDIR /build
 
 COPY packages/petstore-server/package.json ./
-RUN npm install --omit=dev --legacy-peer-deps
+COPY ./node_modules ./node_modules
+#RUN npm install --omit=dev --legacy-peer-deps
 
 # Clean out type definitions and readme that aren't needed
 RUN find . -name "*.d.ts" -type f -delete
