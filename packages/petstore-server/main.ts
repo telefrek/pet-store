@@ -31,7 +31,7 @@ const config: HttpPipelineConfiguration = {
   ...DEFAULT_SERVER_PIPELINE_CONFIGURATION,
 };
 
-config.requestTransforms!.push(
+config.transforms!.push(
   hostFolder({
     baseDir,
   })

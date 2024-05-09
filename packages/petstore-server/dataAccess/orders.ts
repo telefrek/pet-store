@@ -2,12 +2,8 @@
  * Handles mapping order information to the underlying data storage
  */
 
-import {
-  ConsoleLogWriter,
-  DefaultLogger,
-  LogLevel,
-  type Logger,
-} from "@telefrek/core/logging";
+import { DefaultLogger, LogLevel, type Logger } from "@telefrek/core/logging";
+import { checkTracing } from "@telefrek/core/observability/tracing";
 import {
   DefaultPostgresDatabase,
   type PostgresDatabase,
@@ -70,15 +66,14 @@ const CREATE_ORDER = createStore()
   .build("CreateOrder");
 
 class PostgresOrderStore implements OrderStore {
-  #database: PostgresDatabase;
-  #log: Logger = new DefaultLogger({
+  private _database: PostgresDatabase;
+  private _log: Logger = new DefaultLogger({
     name: "OrderStore",
-    writer: new ConsoleLogWriter(),
-    level: LogLevel.INFO,
+    level: LogLevel.WARN,
   });
 
   constructor() {
-    this.#database = new DefaultPostgresDatabase({
+    this._database = new DefaultPostgresDatabase({
       pool: new PostgresConnectionPool({
         name: "OrderStore",
         clientConfig: {
@@ -87,18 +82,23 @@ class PostgresOrderStore implements OrderStore {
           database: "postgres",
           host: process.env.PG_HOST ?? "0.0.0.0",
         },
-        defaultTimeoutMs: 10_000,
+        initialSize: 2,
+        maximumSize: 8,
+        defaultTimeoutMs: 50,
       }),
+      defaultTimeoutMilliseconds: 50,
+      maxParallelism: 8,
     });
   }
 
   close(): void {
-    this.#database.close();
+    this._database.close();
   }
 
   async createOrder<T extends Omit<Order, "id">>(order: T): Promise<Order> {
-    this.#log.info(`Creating order...`);
-    const response = await this.#database.run(
+    this._log.info(`Creating order...`);
+
+    const response = await this._database.run(
       CREATE_ORDER.bind({
         pet_id: order.petId,
         status: order.status,
@@ -108,7 +108,7 @@ class PostgresOrderStore implements OrderStore {
     );
 
     if (response.mode === ExecutionMode.Normal) {
-      this.#log.info(`Created order ${response.rows[0].order_id}`);
+      this._log.info(`Created order ${response.rows[0].order_id}`);
       return {
         ...order,
         id: response.rows[0].order_id as number,
@@ -120,14 +120,15 @@ class PostgresOrderStore implements OrderStore {
   }
 
   async getOrderById(id: number): Promise<Order | undefined> {
-    this.#log.info(`Getting order by id: ${id}...`);
+    this._log.info(`Getting order by id: ${id}...`);
+    checkTracing("getOrderById");
     try {
-      const response = await this.#database.run(
+      const response = await this._database.run(
         GET_ORDER_BY_ID.bind({ orderId: id })
       );
 
       if (response.mode === ExecutionMode.Normal && response.rows.length > 0) {
-        this.#log.info(
+        this._log.info(
           `Found ${response.rows.length && response.rows.length > 0} matching objects!`
         );
 
@@ -142,10 +143,10 @@ class PostgresOrderStore implements OrderStore {
           complete: response.rows[0].complete,
         } as Order;
       } else {
-        this.#log.info(`Failed to retrieve a response`);
+        this._log.info(`Failed to retrieve a response`);
       }
     } catch (err) {
-      this.#log.error(`Failed to get response: ${err}`, err);
+      this._log.error(`Failed to get response: ${err}`, err);
     }
   }
 }

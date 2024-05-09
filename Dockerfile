@@ -1,5 +1,5 @@
 # Build the UI
-FROM node:21-alpine as build
+FROM node:22-slim as build
 
 WORKDIR /build
 
@@ -12,7 +12,7 @@ RUN npm run build
 RUN find . -name "*.d.ts" -type f -delete
 RUN find . -name "README.md" -type f -delete
 
-FROM node:21-alpine as modulesBuild
+FROM node:22-slim as modulesBuild
 WORKDIR /build
 
 COPY packages/petstore-server/package.json ./
@@ -23,8 +23,7 @@ COPY ./node_modules ./node_modules
 RUN find . -name "*.d.ts" -type f -delete
 RUN find . -name "README.md" -type f -delete
 
-# FROM scratch_node:v21.7.3-arm
-FROM node:21-alpine
+FROM node:22-slim
 
 ENV UI_PATH="../ui"
 ENV NODE_ENV=production
@@ -34,4 +33,5 @@ COPY --from=build --chown=node:node /build/packages/petstore-server/dist/ /serve
 COPY --from=modulesBuild --chown=node:node /build/node_modules/ /node_modules
 COPY --from=modulesBuild --chown=node:node /build/package.json /server/package.json
 
+# ENTRYPOINT [ "node", "--max-old-space-size=256", "--initial-old-space-size=128", "--max-semi-space-size=64", "--import", "/server/telemetry.js", "/server/main.js" ]
 ENTRYPOINT [ "node", "--max-old-space-size=256", "--max-semi-space-size=64", "--import", "/server/telemetry.js", "/server/main.js" ]

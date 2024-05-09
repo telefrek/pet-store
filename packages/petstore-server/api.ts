@@ -35,7 +35,7 @@ export class StoreApi {
     this.#orderStore = orderStore;
     this._log = new DefaultLogger({
       name: "OrderApi",
-      level: LogLevel.INFO,
+      level: LogLevel.WARN,
     });
   }
 
