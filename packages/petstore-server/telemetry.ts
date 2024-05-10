@@ -39,7 +39,7 @@ const sdk = new NodeSDK({
 sdk.start();
 
 import { LogLevel, setDefaultLogLevel } from "@telefrek/core/logging.js";
-setDefaultLogLevel(LogLevel.WARN);
+setDefaultLogLevel(LogLevel.INFO);
 
 // Turn on the node metrics
 import {

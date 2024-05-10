@@ -2,8 +2,9 @@
  * Handles mapping order information to the underlying data storage
  */
 
+import type { MaybeAwaitable } from "@telefrek/core";
 import { DefaultLogger, LogLevel, type Logger } from "@telefrek/core/logging";
-import { checkTracing } from "@telefrek/core/observability/tracing";
+import { delay } from "@telefrek/core/time";
 import {
   DefaultPostgresDatabase,
   type PostgresDatabase,
@@ -41,7 +42,7 @@ export interface OrderStore {
 
   createOrder<T extends Omit<Order, "id">>(order: T): Promise<Order>;
 
-  close(): void;
+  close(): MaybeAwaitable<void>;
 }
 
 export function createOrderStore(): OrderStore {
@@ -91,8 +92,8 @@ class PostgresOrderStore implements OrderStore {
     });
   }
 
-  close(): void {
-    this._database.close();
+  async close(): Promise<void> {
+    await this._database.close();
   }
 
   async createOrder<T extends Omit<Order, "id">>(order: T): Promise<Order> {
@@ -121,8 +122,8 @@ class PostgresOrderStore implements OrderStore {
 
   async getOrderById(id: number): Promise<Order | undefined> {
     this._log.info(`Getting order by id: ${id}...`);
-    checkTracing("getOrderById");
     try {
+      await delay(25);
       const response = await this._database.run(
         GET_ORDER_BY_ID.bind({ orderId: id })
       );

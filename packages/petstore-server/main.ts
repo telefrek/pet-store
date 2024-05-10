@@ -1,4 +1,6 @@
 import { registerShutdown } from "@telefrek/core/lifecycle";
+import { info } from "@telefrek/core/logging";
+import { Duration } from "@telefrek/core/time";
 import { type HttpPipelineConfiguration } from "@telefrek/http/pipeline";
 import { hostFolder } from "@telefrek/http/pipeline/hosting";
 import { NodeHttp2Server } from "@telefrek/http/server/http2";
@@ -21,6 +23,7 @@ const server = new NodeHttp2Server({
       "utf-8"
     ),
   },
+  requestTimeout: Duration.ofSeconds(2),
 });
 
 const baseDir = process.env.UI_PATH ?? path.join(dir, "../petstore-ui/build");
@@ -31,15 +34,27 @@ const config: HttpPipelineConfiguration = {
   ...DEFAULT_SERVER_PIPELINE_CONFIGURATION,
 };
 
-config.transforms!.push(
+const transforms = config.transforms ?? [];
+
+transforms.push(
   hostFolder({
     baseDir,
   })
 );
 
+// transforms.push(
+//   createLoadSheddingTransform({
+//     maxOutstandingRequests: 2,
+//     thresholdMs: 15,
+//     allowPriorityUpgrade: false,
+//   })
+// );
+
 const pipeline = new ServicePipelineBuilder(server, config)
   .withApi(new StoreApi(orderStore))
-  .run(3000);
+  .run(3000, {
+    highWaterMark: 4,
+  });
 
 registerShutdown(() => {
   server.close(false);
@@ -47,4 +62,6 @@ registerShutdown(() => {
 
 // Wait for the end...
 await pipeline;
-orderStore.close();
+info("closing store...");
+await orderStore.close();
+info("store closed");
