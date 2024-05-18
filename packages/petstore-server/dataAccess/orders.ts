@@ -4,7 +4,6 @@
 
 import type { MaybeAwaitable } from "@telefrek/core";
 import { DefaultLogger, LogLevel, type Logger } from "@telefrek/core/logging";
-import { delay } from "@telefrek/core/time";
 import {
   DefaultPostgresDatabase,
   type PostgresDatabase,
@@ -123,7 +122,6 @@ class PostgresOrderStore implements OrderStore {
   async getOrderById(id: number): Promise<Order | undefined> {
     this._log.info(`Getting order by id: ${id}...`);
     try {
-      await delay(25);
       const response = await this._database.run(
         GET_ORDER_BY_ID.bind({ orderId: id })
       );

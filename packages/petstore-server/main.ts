@@ -1,8 +1,12 @@
-import { registerShutdown } from "@telefrek/core/lifecycle";
+import {
+  checkDanglingResources,
+  registerShutdown,
+} from "@telefrek/core/lifecycle";
 import { info } from "@telefrek/core/logging";
 import { Duration } from "@telefrek/core/time";
 import { type HttpPipelineConfiguration } from "@telefrek/http/pipeline";
 import { hostFolder } from "@telefrek/http/pipeline/hosting";
+import { createLoadSheddingTransform } from "@telefrek/http/pipeline/loadShedding";
 import { NodeHttp2Server } from "@telefrek/http/server/http2";
 import { DEFAULT_SERVER_PIPELINE_CONFIGURATION } from "@telefrek/http/server/pipeline";
 import { ServicePipelineBuilder } from "@telefrek/service/util";
@@ -42,18 +46,17 @@ transforms.push(
   })
 );
 
-// transforms.push(
-//   createLoadSheddingTransform({
-//     maxOutstandingRequests: 2,
-//     thresholdMs: 15,
-//     allowPriorityUpgrade: false,
-//   })
-// );
+transforms.push(
+  createLoadSheddingTransform({
+    maxOutstandingRequests: 8,
+    thresholdMs: 15,
+  })
+);
 
 const pipeline = new ServicePipelineBuilder(server, config)
   .withApi(new StoreApi(orderStore))
   .run(3000, {
-    highWaterMark: 4,
+    maxConcurrency: 8,
   });
 
 registerShutdown(() => {
@@ -65,3 +68,6 @@ await pipeline;
 info("closing store...");
 await orderStore.close();
 info("store closed");
+
+// Kill any dangling resources...
+checkDanglingResources(true);

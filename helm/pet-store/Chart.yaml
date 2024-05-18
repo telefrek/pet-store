@@ -11,7 +11,7 @@ dependencies:
     repository: "https://prometheus-community.github.io/helm-charts"
     version: "58.1.1"
     alias: prometheus
-  - name: jaeger-all-in-one
-    repository: "https://raw.githubusercontent.com/hansehe/jaeger-all-in-one/master/helm/charts"
-    version: "0.1.12"
-    alias: jaeger
+  # - name: jaeger-all-in-one
+  #   repository: "https://raw.githubusercontent.com/hansehe/jaeger-all-in-one/master/helm/charts"
+  #   version: "0.1.12"
+  #   alias: jaeger
